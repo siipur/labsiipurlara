@@ -16,7 +16,10 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        // get articles with pagination
+        $articles = Article::paginate(15);
+        // return collection of articles as a resources
+        return ArticleResource::collection($articles);
     }
 
     /**
@@ -37,7 +40,16 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //jika method 'PUT' maka fungsi update data, namun jika tidak maka fungsi create data method 'POST'
+        $article = $request->isMethod('PUT') ? Article::findOrFail($request->article_id) : new Article;
+        
+        $article->id = $request->input('article_id');
+        $article->title = $request->input('title');
+        $article->body = $request->input('body');
+        
+        if ($article->save()) {
+            return new ArticleResource($article);
+        }
     }
 
     /**
@@ -48,7 +60,10 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        //
+        // get single articles
+        $article = Article::findOrFail($id);
+        // return single articles as a resources
+        return new ArticleResource($article);
     }
 
     /**
@@ -82,6 +97,11 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // get single articles
+        $article = Article::findOrFail($id);
+        // return single articles as a resources
+        if($article->delete()){        
+            return new ArticleResource($article);
+        }
     }
 }
